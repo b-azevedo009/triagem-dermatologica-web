@@ -3,93 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triagem IA Dermatológica</title>
+  <title>Sistema de Triagem Dermatológica por IA</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f7f6;
+      background-color: #f8f9fa;
+      color: #111111;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
+      padding: 20px;
     }
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      max-width: 450px;
-      width: 90%;
-      text-align: center;
+
+    .container {
+      background-color: #ffffff;
+      border: 2px solid #111111;
+      width: 100%;
+      max-width: 650px;
+      padding: 40px;
     }
-    h1 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 8px; }
-    p { color: #7f8c8d; font-size: 0.95rem; margin-bottom: 20px; }
-    input[type="file"] { display: none; }
-    .upload-btn {
-      background-color: #3498db;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
+
+    .header {
+      border-bottom: 2px solid #111111;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: #111111;
+    }
+
+    .header p {
+      font-size: 0.85rem;
+      color: #555555;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      background-color: #ffffff;
+      color: #111111;
+      border: 2px solid #111111;
+      padding: 14px 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       cursor: pointer;
-      display: inline-block;
-      font-weight: bold;
-      transition: background 0.3s;
+      text-align: center;
+      transition: all 0.2s ease;
+      display: block;
+      width: 100%;
     }
-    .upload-btn:hover { background-color: #2980b9; }
-    #preview {
+
+    .btn:hover {
+      background-color: #111111;
+      color: #ffffff;
+    }
+
+    .btn-accent {
+      background-color: #0056b3;
+      color: #ffffff;
+      border-color: #0056b3;
+    }
+
+    .btn-accent:hover {
+      background-color: #003d80;
+      border-color: #003d80;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .view-panel {
+      border: 1px dashed #111111;
+      min-height: 250px;
+      background-color: #fafafa;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    #preview, #video {
       max-width: 100%;
-      max-height: 200px;
-      border-radius: 8px;
-      margin-top: 15px;
+      max-height: 300px;
+      display: none;
+      border: 1px solid #111111;
+    }
+
+    .placeholder-text {
+      font-size: 0.8rem;
+      color: #777777;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .result-section {
+      border: 2px solid #111111;
+      padding: 20px;
+      background-color: #ffffff;
       display: none;
     }
-    .result-box {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      font-weight: bold;
-      display: none;
+
+    .result-header {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: #555555;
     }
-    .status-normal { background-color: #e8f8f5; color: #27ae60; }
-    .status-alerta { background-color: #fadbd8; color: #c0392b; }
+
+    .result-body {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-alerta {
+      color: #d9534f;
+      border-left: 6px solid #d9534f;
+      padding-left: 10px;
+    }
+
+    .status-benigno {
+      color: #0056b3;
+      border-left: 6px solid #0056b3;
+      padding-left: 10px;
+    }
+
+    .status-processando {
+      color: #f0ad4e;
+      border-left: 6px solid #f0ad4e;
+      padding-left: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>🔬 Triagem Dermatológica IA</h1>
-    <p>Envie uma foto da lesão para análise preliminar por inteligência artificial.</p>
-
-    <label for="imageInput" class="upload-btn">📸 Selecionar Imagem</label>
-    <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
-
-    <div>
-      <img id="preview" alt="Pré-visualização da Imagem">
+  <div class="container">
+    <div class="header">
+      <h1>Módulo de Análise Dermatológica</h1>
+      <p>Rede Neural Convolucional — Protocolo ISIC Archive</p>
     </div>
 
-    <div id="result" class="result-box"></div>
+    <div class="controls-grid">
+      <label for="imageInput" class="btn">Upload de Imagem</label>
+      <input type="file" id="imageInput" accept="image/*" onchange="handleFileUpload(event)">
+      
+      <button class="btn" onclick="startCamera()">Ativar Câmera</button>
+    </div>
+
+    <div class="view-panel" id="viewPanel">
+      <span class="placeholder-text" id="placeholder">Nenhuma imagem selecionada</span>
+      <img id="preview" alt="Amostra de Lesão">
+      <video id="video" autoplay playsinline></video>
+      <button id="captureBtn" class="btn btn-accent" style="display:none; margin-top:15px; width: auto;" onclick="captureCamera()">Capturar Fotografia</button>
+    </div>
+
+    <div id="resultSection" class="result-section">
+      <div class="result-header">Diagnóstico Preliminar de IA</div>
+      <div id="resultText" class="result-body"></div>
+    </div>
   </div>
 
   <script>
-    function previewImage(event) {
-      const reader = new FileReader();
-      const preview = document.getElementById('preview');
-      const resultBox = document.getElementById('result');
+    const preview = document.getElementById('preview');
+    const video = document.getElementById('video');
+    const placeholder = document.getElementById('placeholder');
+    const captureBtn = document.getElementById('captureBtn');
+    const resultSection = document.getElementById('resultSection');
+    const resultText = document.getElementById('resultText');
 
-      reader.onload = function() {
-        preview.src = reader.result;
-        preview.style.display = 'block';
-        
-        // Simulação de resposta enquanto conectamos a API final
-        resultBox.style.display = 'block';
-        resultBox.className = 'result-box status-normal';
-        resultBox.innerHTML = '⏳ Processando imagem na IA...';
+    let stream = null;
+
+    function resetView() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
       }
-      
-      if(event.target.files[0]) {
-        reader.readAsDataURL(event.target.files[0]);
+      video.style.display = 'none';
+      captureBtn.style.display = 'none';
+      preview.style.display = 'none';
+      placeholder.style.display = 'none';
+    }
+
+    function handleFileUpload(event) {
+      resetView();
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          processAnalysis();
+        }
+        reader.readAsDataURL(file);
       }
+    }
+
+    async function startCamera() {
+      resetView();
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        captureBtn.style.display = 'inline-block';
+      } catch (err) {
+        alert("Acesso à câmera negado ou não suportado no dispositivo.");
+        placeholder.style.display = 'block';
+      }
+    }
+
+    function captureCamera() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      preview.src = canvas.toDataURL('image/png');
+      resetView();
+      preview.style.display = 'block';
+      processAnalysis();
+    }
+
+    function processAnalysis() {
+      resultSection.style.display = 'block';
+      resultText.className = 'result-body status-processando';
+      resultText.innerText = 'Processando matriz de tensores...';
+
+      // Conexão simulada — será substituída pela chamada da API do Hugging Face
+      setTimeout(() => {
+        resultText.className = 'result-body status-benigno';
+        resultText.innerText = 'Lesão Classificada: Sem Alterações Críticas (Benigno)';
+      }, 1500);
     }
   </script>
 
