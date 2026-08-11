@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triagem IA Dermatológica</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+    }
+    h1 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 8px; }
+    p { color: #7f8c8d; font-size: 0.95rem; margin-bottom: 20px; }
+    input[type="file"] { display: none; }
+    .upload-btn {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .upload-btn:hover { background-color: #2980b9; }
+    #preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-top: 15px;
+      display: none;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: none;
+    }
+    .status-normal { background-color: #e8f8f5; color: #27ae60; }
+    .status-alerta { background-color: #fadbd8; color: #c0392b; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🔬 Triagem Dermatológica IA</h1>
+    <p>Envie uma foto da lesão para análise preliminar por inteligência artificial.</p>
+
+    <label for="imageInput" class="upload-btn">📸 Selecionar Imagem</label>
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+
+    <div>
+      <img id="preview" alt="Pré-visualização da Imagem">
+    </div>
+
+    <div id="result" class="result-box"></div>
+  </div>
+
+  <script>
+    function previewImage(event) {
+      const reader = new FileReader();
+      const preview = document.getElementById('preview');
+      const resultBox = document.getElementById('result');
+
+      reader.onload = function() {
+        preview.src = reader.result;
+        preview.style.display = 'block';
+        
+        // Simulação de resposta enquanto conectamos a API final
+        resultBox.style.display = 'block';
+        resultBox.className = 'result-box status-normal';
+        resultBox.innerHTML = '⏳ Processando imagem na IA...';
+      }
+      
+      if(event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    }
+  </script>
+
+</body>
+</html>
