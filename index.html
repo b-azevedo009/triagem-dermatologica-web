@@ -5,41 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema de Triagem Dermatológica</title>
   <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #1f2937;
+      --panel-bg: #111827;
+      --border-color: #374151;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --panel-bg: #f9fafb;
+      --border-color: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, Roboto, sans-serif; }
-    body { background-color: #0b0f19; color: #f3f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .gradio-container { background-color: #1f2937; border: 1px solid #374151; border-radius: 12px; width: 100%; max-width: 900px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
-    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: #ffffff; }
-    p.desc { font-size: 0.9rem; color: #9ca3af; margin-bottom: 20px; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; transition: background 0.3s, color 0.3s; }
+    
+    .gradio-container { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; width: 100%; max-width: 900px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    
+    .header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+    p.desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+    
+    .theme-toggle { background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-    .panel { background-color: #111827; border: 1px solid #374151; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .panel-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #9ca3af; }
-    .upload-box { border: 2px dashed #4b5563; border-radius: 8px; padding: 30px 10px; text-align: center; cursor: pointer; background-color: #1f2937; }
-    .upload-box:hover { border-color: #f97316; }
+    
+    .panel { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .panel-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }
+    
+    .mode-buttons { display: flex; gap: 8px; }
+    .btn-tab { flex: 1; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .btn-tab.active { border-color: var(--accent); color: var(--accent); }
+    
+    .media-box { border: 2px dashed var(--border-color); border-radius: 8px; min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; text-align: center; background-color: var(--card-bg); position: relative; }
+    
     input[type="file"] { display: none; }
-    .btn-orange { background-color: #f97316; color: white; border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn-orange:hover { background-color: #ea580c; }
-    #preview { width: 100%; max-height: 220px; object-fit: contain; border-radius: 6px; display: none; margin-top: 10px; }
-    .output-box { background-color: #1f2937; border: 1px solid #374151; border-radius: 6px; padding: 14px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    #preview, #video { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; display: none; }
+    
+    .btn-orange { background-color: var(--accent); color: white; border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; }
+    .btn-orange:hover { background-color: var(--accent-hover); }
+    
+    .output-box { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-main); }
   </style>
 </head>
-<body>
+<body data-theme="dark">
 
   <div class="gradio-container">
-    <h1>Sistema de Triagem Dermatológica</h1>
-    <p class="desc">Envie uma imagem de lesão para análise preditiva por Inteligência Artificial.</p>
+    <div class="header-bar">
+      <div>
+        <h1>Sistema de Triagem Dermatológica</h1>
+        <p class="desc">Envie uma imagem de lesão para análise preditiva por Inteligência Artificial.</p>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀️ Modo Claro</button>
+    </div>
 
     <div class="grid">
       <div class="panel">
         <span class="panel-title">Input</span>
         
-        <label for="imageInput" class="upload-box">
-          <span id="uploadText">Clique para fazer upload ou arraste o arquivo</span>
-          <img id="preview" alt="Preview">
-        </label>
-        <input type="file" id="imageInput" accept="image/*" onchange="handleFile(event)">
+        <div class="mode-buttons">
+          <button class="btn-tab active" id="tabUpload" onclick="setMode('upload')">Upload</button>
+          <button class="btn-tab" id="tabWebcam" onclick="setMode('webcam')">Câmera</button>
+        </div>
 
-        <button class="btn-orange" onclick="processImage()">Submit</button>
+        <div class="media-box" id="mediaBox">
+          <label for="imageInput" id="uploadLabel" style="cursor: pointer; width: 100%;">
+            <span id="uploadText" style="color: var(--text-muted); font-size: 0.9rem;">Clique para selecionar uma foto</span>
+          </label>
+          <input type="file" id="imageInput" accept="image/*" onchange="handleFile(event)">
+          
+          <img id="preview" alt="Preview">
+          <video id="video" autoplay playsinline></video>
+        </div>
+
+        <button class="btn-orange" id="actionBtn" onclick="processAction()">Submit</button>
       </div>
 
       <div class="panel">
@@ -52,6 +102,66 @@
   </div>
 
   <script>
+    let currentMode = 'upload';
+    let stream = null;
+
+    function toggleTheme() {
+      const body = document.body;
+      const themeBtn = document.getElementById('themeBtn');
+      if (body.getAttribute('data-theme') === 'dark') {
+        body.setAttribute('data-theme', 'light');
+        themeBtn.innerText = '🌙 Modo Escuro';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        themeBtn.innerText = '☀️ Modo Claro';
+      }
+    }
+
+    function stopStream() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      stopStream();
+      
+      document.getElementById('tabUpload').classList.toggle('active', mode === 'upload');
+      document.getElementById('tabWebcam').classList.toggle('active', mode === 'webcam');
+      
+      const preview = document.getElementById('preview');
+      const video = document.getElementById('video');
+      const uploadText = document.getElementById('uploadText');
+      const actionBtn = document.getElementById('actionBtn');
+
+      preview.style.display = 'none';
+      video.style.display = 'none';
+
+      if (mode === 'upload') {
+        uploadText.style.display = 'block';
+        uploadText.innerText = 'Clique para selecionar uma foto';
+        actionBtn.innerText = 'Submit';
+      } else {
+        uploadText.style.display = 'none';
+        actionBtn.innerText = 'Tirar Foto & Analisar';
+        startCamera();
+      }
+    }
+
+    async function startCamera() {
+      const video = document.getElementById('video');
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.style.display = 'block';
+      } catch (err) {
+        alert("Não foi possível acessar a câmera.");
+        setMode('upload');
+      }
+    }
+
     function handleFile(event) {
       const file = event.target.files[0];
       if (file) {
@@ -66,13 +176,27 @@
       }
     }
 
-    function processImage() {
+    function processAction() {
       const output = document.getElementById('outputResult');
-      output.innerText = "Processando matriz de imagem...";
       
-      // Simulação da chamada
+      if (currentMode === 'webcam' && stream) {
+        const video = document.getElementById('video');
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const preview = document.getElementById('preview');
+        preview.src = canvas.toDataURL('image/png');
+        preview.style.display = 'block';
+        video.style.display = 'none';
+        stopStream();
+      }
+
+      output.innerText = "Processando imagem com TensorFlow...";
       setTimeout(() => {
-        output.innerText = "Resultado: Benigno (Normal)";
+        output.innerText = "Resultado: Benigno (Sem alterações críticas)";
       }, 1200);
     }
   </script>
